@@ -156,6 +156,27 @@ function VerdictTag({type}){
   return React.createElement("span",{style:{display:"inline-block",padding:"3px 10px",borderRadius:20,fontSize:10,fontWeight:700,letterSpacing:.5,color:v.color,background:v.bg,border:`1px solid ${v.color}33`,textTransform:"uppercase",lineHeight:1.4,whiteSpace:"nowrap"}},v.label);
 }
 
+/* Smart Taobao link handler: tries app deep link first, falls back to web */
+function openTaobao(webUrl, e){
+  e.preventDefault();
+  e.stopPropagation();
+  var isMobile = /Android|iPhone|iPad/i.test(navigator.userAgent);
+  if(!isMobile){ window.open(webUrl,"_blank"); return; }
+  /* Build the taobao:// deep link by wrapping the web URL */
+  var deepLink = "taobao://m.taobao.com/tbopen/index.html?h5Url=" + encodeURIComponent(webUrl);
+  var fallbackTimer = null;
+  var hidden = false;
+  function onVisChange(){ if(document.hidden){ hidden=true; clearTimeout(fallbackTimer); } }
+  document.addEventListener("visibilitychange", onVisChange);
+  /* Try opening the app */
+  window.location.href = deepLink;
+  /* If the app doesn't open within 1.5s, fall back to web */
+  fallbackTimer = setTimeout(function(){
+    document.removeEventListener("visibilitychange", onVisChange);
+    if(!hidden){ window.open(webUrl,"_blank"); }
+  }, 1500);
+}
+
 function Card({item,expanded,onToggle,rank}){
   const ws=getWeightedScore(item.scores);
   const tc=ws>=8?"#22c55e":ws>=7.2?"#38bdf8":ws>=6.5?"#fbbf24":"#94a3b8";
@@ -172,9 +193,10 @@ function Card({item,expanded,onToggle,rank}){
         React.createElement("span",{style:{fontSize:15,fontWeight:800,color:"#e2e8f0",fontFamily:"'JetBrains Mono',monospace"}},item.price),
         React.createElement("span",{style:{fontSize:10,color:"rgba(255,255,255,.3)",padding:"2px 8px",borderRadius:6,background:"rgba(255,255,255,.04)",border:"1px solid rgba(255,255,255,.06)"}},item.platform)
       ),
-      /* Shop Link */
+      /* Shop Link — tries app first on mobile, falls back to web */
       React.createElement("div",{style:{marginBottom:10},onClick:function(e){e.stopPropagation()}},
-        React.createElement("a",{href:item.link,target:"_blank",rel:"noopener noreferrer",style:{fontSize:11,fontWeight:600,color:"#38bdf8",borderBottom:"1px solid rgba(56,189,248,.25)",textDecoration:"none",transition:"all .2s"}},"🔗 Open Store / Search on Taobao →")
+        React.createElement("a",{href:item.link,onClick:function(e){openTaobao(item.link,e)},style:{fontSize:11,fontWeight:600,color:"#38bdf8",borderBottom:"1px solid rgba(56,189,248,.25)",textDecoration:"none",transition:"all .2s",cursor:"pointer"}},"📱 Open in Taobao App → "),
+        React.createElement("span",{style:{fontSize:9,color:"rgba(255,255,255,.2)",marginLeft:4}},"falls back to web if app not installed")
       ),
       React.createElement("div",{style:{display:"flex",gap:6,flexWrap:"wrap"}},
         item.verdicts.map(function(v){return React.createElement(VerdictTag,{key:v,type:v})})
