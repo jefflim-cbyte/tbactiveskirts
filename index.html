@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Taobao Sports Skirts — Grading Matrix</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.9/babel.min.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@500;600;700;800&display=swap" rel="stylesheet"/>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html{background:#0a0a0c}
+body{background:#0a0a0c;color:#e2e8f0;font-family:'DM Sans','Helvetica Neue',sans-serif;-webkit-font-smoothing:antialiased}
+::-webkit-scrollbar{width:0;height:0}
+@keyframes fadeSlide{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+a{color:#38bdf8;text-decoration:none;border-bottom:1px solid rgba(56,189,248,.25);transition:all .2s}
+a:hover{color:#7dd3fc;border-bottom-color:rgba(56,189,248,.6)}
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+const {useState, useMemo, Fragment} = React;
+
+/* ─── DATA ─── */
+const CRITERIA = [
+  {key:"price",label:"Price Value",weight:.20,desc:"Cost-effectiveness relative to quality"},
+  {key:"fabric",label:"Fabric Tech",weight:.20,desc:"Moisture-wicking, breathability, stretch"},
+  {key:"design",label:"Design & Style",weight:.15,desc:"Aesthetic appeal, color range, versatility"},
+  {key:"function",label:"Functionality",weight:.20,desc:"Built-in shorts, pockets, coverage"},
+  {key:"durability",label:"Durability",weight:.15,desc:"Longevity, pilling resistance, color retention"},
+  {key:"sizing",label:"Sizing & Fit",weight:.10,desc:"Accurate sizing, Asian-fit availability"},
+];
+
+const VERDICT_TAGS = {
+  "best-value":{label:"Best Value",color:"#22c55e",bg:"rgba(34,197,94,.12)"},
+  "premium-pick":{label:"Premium Pick",color:"#a78bfa",bg:"rgba(167,139,250,.12)"},
+  "best-design":{label:"Best Design",color:"#f472b6",bg:"rgba(244,114,182,.12)"},
+  "most-functional":{label:"Most Functional",color:"#38bdf8",bg:"rgba(56,189,248,.12)"},
+  "budget-friendly":{label:"Budget Friendly",color:"#fbbf24",bg:"rgba(251,191,36,.12)"},
+  "trending":{label:"Trending 2025",color:"#fb923c",bg:"rgba(251,146,60,.12)"},
+  "lulu-dupe":{label:"Lulu Dupe",color:"#e879f9",bg:"rgba(232,121,249,.12)"},
+  "beginner":{label:"Beginner Pick",color:"#6ee7b7",bg:"rgba(110,231,183,.12)"},
+};
+
+const SKIRTS = [
+  {
+    id:1,name:"VFU Pleated Tennis Skort",store:"VFU Official 旗舰店",platform:"Tmall",
+    price:"¥89–139",
+    link:"https://vfuyundong.world.tmall.com/",
+    searchLink:"https://s.taobao.com/search?q=VFU+%E8%BF%90%E5%8A%A8%E8%A3%99",
+    scores:{price:7.5,fabric:8.5,design:8,function:9,durability:8,sizing:7},
+    verdicts:["premium-pick","most-functional"],
+    pros:["High-performance 4-way stretch fabric with compression feel","Built-in shorts with dual side pockets for phone/keys","Wide elastic waistband — no rolling or bunching","Available in 15+ seasonal colors, including muted tones"],
+    cons:["Runs slightly small — size up half a size","Higher price than most Taobao alternatives","Some buyers report logo peeling after 20+ washes"],
+  },
+  {
+    id:2,name:"Neverme High-Waist Sports Skirt",store:"Neverme 旗舰店",platform:"Taobao",
+    price:"¥59–89",
+    link:"https://s.taobao.com/search?q=Neverme+%E8%BF%90%E5%8A%A8%E8%A3%99",
+    searchLink:"https://s.taobao.com/search?q=Neverme+%E8%BF%90%E5%8A%A8%E8%A3%99",
+    scores:{price:8.5,fabric:8,design:7.5,function:8,durability:8.5,sizing:8},
+    verdicts:["best-value","trending"],
+    pros:["Exceptional durability — users report 4+ years of regular wear","Great support even for high-impact activities like running","Consistent quality across their entire range","Very reasonable pricing for the quality tier"],
+    cons:["Colors fade noticeably after extended use (2+ years)","Limited skirt-specific designs — stronger in bras/leggings","Fewer trendy or seasonal colorways compared to competitors"],
+  },
+  {
+    id:3,name:"Chaoyanyu Skater-Style Running Skort",store:"Chaoyanyu Sports 潮颜语",platform:"Taobao",
+    price:"¥35–68",
+    link:"https://s.taobao.com/search?q=%E6%BD%AE%E9%A2%9C%E8%AF%AD+%E8%BF%90%E5%8A%A8%E8%A3%99",
+    searchLink:"https://s.taobao.com/search?q=%E6%BD%AE%E9%A2%9C%E8%AF%AD+%E8%BF%90%E5%8A%A8%E8%A3%99",
+    scores:{price:9.5,fabric:6.5,design:8,function:7,durability:6,sizing:7.5},
+    verdicts:["budget-friendly","best-design"],
+    pros:["Ultra-affordable — full outfits possible under ¥100","Trendy skater-skirt silhouette doubles as casual wear","Wide variety of styles from yoga to hiking pieces","Also carries matching jackets and long-sleeve tops"],
+    cons:["Thinner fabric — less suitable for cooler weather or high-intensity","Built-in shorts feel basic compared to premium brands","Durability concerns for frequent weekly use"],
+  },
+  {
+    id:4,name:"Fenin Detachable Skirt + Shorts Set",store:"Fenin Activewear",platform:"Taobao / Shopee",
+    price:"¥49–79",
+    link:"https://s.taobao.com/search?q=Fenin+%E8%BF%90%E5%8A%A8%E8%A3%99+%E5%A5%B3",
+    searchLink:"https://s.taobao.com/search?q=Fenin+%E8%BF%90%E5%8A%A8%E8%A3%99+%E5%A5%B3",
+    scores:{price:9,fabric:7,design:7.5,function:8.5,durability:6.5,sizing:7},
+    verdicts:["budget-friendly","most-functional"],
+    pros:["Unique detachable skirt design — wear as skirt or shorts","Sports bra + shorts combos available for ~¥50","Good variety of sports bra styles to mix and match","Also sells fitness equipment like sliding plates"],
+    cons:["Detachable mechanism can feel flimsy after many uses","Fabric technology lags behind VFU / Neverme tier","Sizing inconsistencies reported across different items"],
+  },
+  {
+    id:5,name:"高小姐的店 Lulu-Style Pleated Skort",store:"高小姐的店 (Miss Gao)",platform:"Taobao",
+    price:"¥68–118",
+    link:"https://s.taobao.com/search?q=%E9%AB%98%E5%B0%8F%E5%A7%90%E7%9A%84%E5%BA%97+%E8%BF%90%E5%8A%A8%E8%A3%99",
+    searchLink:"https://s.taobao.com/search?q=%E9%AB%98%E5%B0%8F%E5%A7%90%E7%9A%84%E5%BA%97+%E8%BF%90%E5%8A%A8%E8%A3%99",
+    scores:{price:8,fabric:8,design:8.5,function:8,durability:7.5,sizing:7.5},
+    verdicts:["lulu-dupe","trending"],
+    pros:["Buttery-soft fabric closely mimics Lululemon feel","Pleated design with premium-look finishing details","Impressive quality that surprises for the price point","Strong community reviews on Lemon8 and Xiaohongshu"],
+    cons:["Not original design — closely replicates branded aesthetics","Stock can sell out quickly on popular colorways","No official brand warranty or quality guarantee"],
+  },
+  {
+    id:6,name:"Kemi Matching Activewear Skort Set",store:"Kemi Sport",platform:"Taobao",
+    price:"¥49–89",
+    link:"https://s.taobao.com/search?q=Kemi+%E8%BF%90%E5%8A%A8%E5%A5%97%E8%A3%85+%E5%A5%B3+%E8%A3%99",
+    searchLink:"https://s.taobao.com/search?q=Kemi+%E8%BF%90%E5%8A%A8%E5%A5%97%E8%A3%85+%E5%A5%B3+%E8%A3%99",
+    scores:{price:8.5,fabric:7.5,design:8,function:7.5,durability:7,sizing:8},
+    verdicts:["best-value","beginner"],
+    pros:["Sleek matching sets — coordinated top-to-bottom looks from ~¥80","Comfortable Lululemon-alternative quality from ¥49","Good Asian sizing accuracy across their range","Excellent entry point for building an activewear wardrobe"],
+    cons:["Mid-tier fabric — adequate but not exceptional performance","Design language can feel generic across collections","Less technical innovation than dedicated sports brands"],
+  },
+  {
+    id:7,name:"Banana In Quick-Dry Tennis Skirt",store:"Banana In 官方旗舰店",platform:"Tmall",
+    price:"¥99–159",
+    link:"https://s.taobao.com/search?q=Banana+In+%E8%BF%90%E5%8A%A8%E8%A3%99+%E5%A5%B3",
+    searchLink:"https://s.taobao.com/search?q=Banana+In+%E8%BF%90%E5%8A%A8%E8%A3%99+%E5%A5%B3",
+    scores:{price:6.5,fabric:9,design:7.5,function:8.5,durability:9,sizing:8.5},
+    verdicts:["premium-pick","most-functional"],
+    pros:["Top-tier quick-dry and moisture-wicking technology","Excellent build quality — highly durable across seasons","Well-regarded brand with strong Tmall presence","Accurate sizing with detailed measurement guides"],
+    cons:["Highest price tier among Taobao activewear brands","Design tends toward conservative/minimal — fewer bold options","Limited color palette compared to trendier competitors"],
+  },
+  {
+    id:8,name:"Akiyo Studio 29 Art-Print Skort",store:"Akiyo Studio 29",platform:"Taobao",
+    price:"¥79–129",
+    link:"https://s.taobao.com/search?q=Akiyo+Studio+29+%E8%BF%90%E5%8A%A8%E8%A3%99",
+    searchLink:"https://s.taobao.com/search?q=Akiyo+Studio+29+%E8%BF%90%E5%8A%A8%E8%A3%99",
+    scores:{price:7,fabric:7,design:9.5,function:7,durability:7,sizing:7},
+    verdicts:["best-design","trending"],
+    pros:["Truly unique artistic prints — unlike anything on the market","Standout designs that work as athleisure streetwear","Creative silhouettes beyond standard pleated/A-line","Strong following among fashion-forward fitness community"],
+    cons:["Fabric performance secondary to design focus","Bold prints may not suit everyone's gym wardrobe","Functional features (pockets, liner) are basic"],
+  },
+];
+
+const SORT_OPTIONS = [
+  {key:"weighted",label:"Overall Score"},
+  {key:"price",label:"Price Value"},
+  {key:"fabric",label:"Fabric Tech"},
+  {key:"design",label:"Design"},
+  {key:"function",label:"Functionality"},
+  {key:"durability",label:"Durability"},
+];
+
+function getWeightedScore(s){return CRITERIA.reduce((a,c)=>a+s[c.key]*c.weight,0)}
+
+/* ─── COMPONENTS ─── */
+function ScoreBar({value,max=10,color}){
+  const pct=(value/max)*100;
+  return React.createElement("div",{style:{display:"flex",alignItems:"center",gap:8,width:"100%"}},
+    React.createElement("div",{style:{flex:1,height:6,borderRadius:3,background:"rgba(255,255,255,.06)",overflow:"hidden"}},
+      React.createElement("div",{style:{width:pct+"%",height:"100%",borderRadius:3,background:`linear-gradient(90deg,${color}88,${color})`,transition:"width .6s cubic-bezier(.23,1,.32,1)"}})
+    ),
+    React.createElement("span",{style:{fontSize:11,fontWeight:600,color,minWidth:28,textAlign:"right",fontFamily:"'JetBrains Mono',monospace"}},value.toFixed(1))
+  );
+}
+
+function VerdictTag({type}){
+  const v=VERDICT_TAGS[type];if(!v)return null;
+  return React.createElement("span",{style:{display:"inline-block",padding:"3px 10px",borderRadius:20,fontSize:10,fontWeight:700,letterSpacing:.5,color:v.color,background:v.bg,border:`1px solid ${v.color}33`,textTransform:"uppercase",lineHeight:1.4,whiteSpace:"nowrap"}},v.label);
+}
+
+function Card({item,expanded,onToggle,rank}){
+  const ws=getWeightedScore(item.scores);
+  const tc=ws>=8?"#22c55e":ws>=7.2?"#38bdf8":ws>=6.5?"#fbbf24":"#94a3b8";
+  return React.createElement("div",{style:{background:"linear-gradient(135deg,rgba(255,255,255,.03) 0%,rgba(255,255,255,.01) 100%)",border:"1px solid rgba(255,255,255,.07)",borderRadius:16,overflow:"hidden",transition:"all .3s",cursor:"pointer",boxShadow:expanded?"0 8px 32px rgba(0,0,0,.4),inset 0 1px 0 rgba(255,255,255,.05)":"0 2px 8px rgba(0,0,0,.2)"},onClick:onToggle},
+    /* Header */
+    React.createElement("div",{style:{padding:"20px 20px 16px",position:"relative"}},
+      React.createElement("div",{style:{position:"absolute",top:16,right:16,width:44,height:44,borderRadius:12,background:`linear-gradient(135deg,${tc}22,${tc}08)`,border:`1px solid ${tc}44`,display:"flex",alignItems:"center",justifyContent:"center",flexDirection:"column"}},
+        React.createElement("span",{style:{fontSize:8,color:tc,opacity:.7,fontWeight:600,lineHeight:1}},"#"),
+        React.createElement("span",{style:{fontSize:18,fontWeight:800,color:tc,lineHeight:1,fontFamily:"'JetBrains Mono',monospace"}},rank)
+      ),
+      React.createElement("div",{style:{fontSize:10,fontWeight:700,letterSpacing:1.5,color:"rgba(255,255,255,.35)",textTransform:"uppercase",marginBottom:6}},item.store),
+      React.createElement("h3",{style:{fontSize:17,fontWeight:700,color:"#f0f0f0",margin:"0 0 8px",lineHeight:1.3,paddingRight:52,fontFamily:"'Instrument Serif',Georgia,serif",letterSpacing:-.3}},item.name),
+      React.createElement("div",{style:{display:"flex",alignItems:"center",gap:8,flexWrap:"wrap",marginBottom:10}},
+        React.createElement("span",{style:{fontSize:15,fontWeight:800,color:"#e2e8f0",fontFamily:"'JetBrains Mono',monospace"}},item.price),
+        React.createElement("span",{style:{fontSize:10,color:"rgba(255,255,255,.3)",padding:"2px 8px",borderRadius:6,background:"rgba(255,255,255,.04)",border:"1px solid rgba(255,255,255,.06)"}},item.platform)
+      ),
+      /* Shop Link */
+      React.createElement("div",{style:{marginBottom:10},onClick:function(e){e.stopPropagation()}},
+        React.createElement("a",{href:item.link,target:"_blank",rel:"noopener noreferrer",style:{fontSize:11,fontWeight:600,color:"#38bdf8",borderBottom:"1px solid rgba(56,189,248,.25)",textDecoration:"none",transition:"all .2s"}},"🔗 Open Store / Search on Taobao →")
+      ),
+      React.createElement("div",{style:{display:"flex",gap:6,flexWrap:"wrap"}},
+        item.verdicts.map(function(v){return React.createElement(VerdictTag,{key:v,type:v})})
+      ),
+      /* Weighted Score */
+      React.createElement("div",{style:{marginTop:14,padding:"10px 14px",borderRadius:10,background:"rgba(255,255,255,.02)",border:"1px solid rgba(255,255,255,.05)",display:"flex",alignItems:"center",justifyContent:"space-between"}},
+        React.createElement("span",{style:{fontSize:11,color:"rgba(255,255,255,.4)",fontWeight:600,textTransform:"uppercase",letterSpacing:.5}},"Weighted Score"),
+        React.createElement("span",{style:{fontSize:20,fontWeight:800,color:tc,fontFamily:"'JetBrains Mono',monospace"}},ws.toFixed(2))
+      )
+    ),
+    /* Scores */
+    React.createElement("div",{style:{padding:"0 20px 16px"}},
+      React.createElement("div",{style:{display:"grid",gap:8}},
+        CRITERIA.map(function(c){
+          return React.createElement("div",{key:c.key,style:{display:"flex",alignItems:"center",gap:8}},
+            React.createElement("span",{style:{fontSize:10,color:"rgba(255,255,255,.4)",minWidth:72,fontWeight:600,textTransform:"uppercase",letterSpacing:.3}},c.label),
+            React.createElement(ScoreBar,{value:item.scores[c.key],color:tc})
+          );
+        })
+      )
+    ),
+    /* Expandable */
+    expanded && React.createElement("div",{style:{padding:"0 20px 20px",animation:"fadeSlide .3s ease"}},
+      React.createElement("div",{style:{borderTop:"1px solid rgba(255,255,255,.06)",paddingTop:16}},
+        React.createElement("div",{style:{marginBottom:14}},
+          React.createElement("div",{style:{fontSize:10,fontWeight:700,letterSpacing:1.2,color:"#22c55e",textTransform:"uppercase",marginBottom:8}},"◆ Strengths"),
+          item.pros.map(function(p,i){return React.createElement("div",{key:i,style:{fontSize:12,color:"rgba(255,255,255,.6)",lineHeight:1.5,padding:"4px 0 4px 14px",position:"relative"}},React.createElement("span",{style:{position:"absolute",left:0,color:"rgba(34,197,94,.5)"}},"›"),p)})
+        ),
+        React.createElement("div",null,
+          React.createElement("div",{style:{fontSize:10,fontWeight:700,letterSpacing:1.2,color:"#f87171",textTransform:"uppercase",marginBottom:8}},"◇ Weaknesses"),
+          item.cons.map(function(c,i){return React.createElement("div",{key:i,style:{fontSize:12,color:"rgba(255,255,255,.5)",lineHeight:1.5,padding:"4px 0 4px 14px",position:"relative"}},React.createElement("span",{style:{position:"absolute",left:0,color:"rgba(248,113,113,.5)"}},"›"),c)})
+        )
+      )
+    ),
+    /* Toggle hint */
+    React.createElement("div",{style:{textAlign:"center",padding:"8px 0 12px",fontSize:10,color:"rgba(255,255,255,.2)",fontWeight:600,letterSpacing:1,textTransform:"uppercase"}},expanded?"tap to collapse ▲":"tap to expand ▼")
+  );
+}
+
+/* ─── GITHUB PAGES GUIDE SECTION ─── */
+function GithubGuide(){
+  const [open,setOpen]=useState(false);
+  const s={section:{marginTop:20},btn:{width:"100%",padding:"14px 18px",background:"linear-gradient(135deg,rgba(56,189,248,.06),rgba(56,189,248,.02))",border:"1px solid rgba(56,189,248,.15)",borderRadius:12,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"space-between",color:"#e2e8f0"},body:{padding:20,marginTop:1,background:"rgba(255,255,255,.02)",border:"1px solid rgba(255,255,255,.07)",borderTop:"none",borderRadius:"0 0 12px 12px",animation:"fadeSlide .3s ease"},h:{fontSize:14,fontWeight:700,color:"#7dd3fc",margin:"18px 0 8px",fontFamily:"'Instrument Serif',Georgia,serif"},p:{fontSize:12,color:"rgba(255,255,255,.55)",lineHeight:1.8,margin:"0 0 6px"},code:{display:"block",margin:"8px 0 14px",padding:"12px 16px",borderRadius:8,background:"rgba(0,0,0,.4)",border:"1px solid rgba(255,255,255,.08)",fontSize:11,fontFamily:"'JetBrains Mono',monospace",color:"#a5f3fc",lineHeight:1.7,overflowX:"auto",whiteSpace:"pre"},step:{display:"flex",gap:10,marginBottom:14},num:{minWidth:26,height:26,borderRadius:8,background:"rgba(56,189,248,.12)",border:"1px solid rgba(56,189,248,.25)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:12,fontWeight:800,color:"#38bdf8",fontFamily:"'JetBrains Mono',monospace",flexShrink:0}};
+
+  return React.createElement("div",{style:s.section},
+    React.createElement("button",{onClick:function(){setOpen(!open)},style:s.btn},
+      React.createElement("span",{style:{fontSize:12,fontWeight:700,letterSpacing:.5,textTransform:"uppercase"}},"📘 GitHub Pages Quick-Start Guide"),
+      React.createElement("span",{style:{fontSize:11,color:"rgba(255,255,255,.3)"}},open?"▲":"▼")
+    ),
+    open && React.createElement("div",{style:s.body},
+      React.createElement("p",{style:{...s.p,color:"rgba(255,255,255,.4)",fontStyle:"italic",marginBottom:16}},"Free hosting for static HTML files like this one. No server needed, no cost, auto-HTTPS."),
+
+      /* Step 1 */
+      React.createElement("div",{style:s.step},
+        React.createElement("div",{style:s.num},"1"),
+        React.createElement("div",null,
+          React.createElement("div",{style:s.h},"Create a GitHub Account"),
+          React.createElement("p",{style:s.p},"Go to ",React.createElement("a",{href:"https://github.com",target:"_blank"},"github.com")," and sign up for free. Verify your email.")
+        )
+      ),
+
+      /* Step 2 */
+      React.createElement("div",{style:s.step},
+        React.createElement("div",{style:s.num},"2"),
+        React.createElement("div",null,
+          React.createElement("div",{style:s.h},"Create a New Repository"),
+          React.createElement("p",{style:s.p},"Click the \"+\" icon → \"New repository\". For a personal site, name it exactly:"),
+          React.createElement("code",{style:s.code},"your-username.github.io"),
+          React.createElement("p",{style:s.p},"For a project site (e.g. this matrix), name it anything you want like:"),
+          React.createElement("code",{style:s.code},"taobao-skirts-matrix"),
+          React.createElement("p",{style:s.p},"Set to Public. Check \"Add a README file\". Click Create.")
+        )
+      ),
+
+      /* Step 3 */
+      React.createElement("div",{style:s.step},
+        React.createElement("div",{style:s.num},"3"),
+        React.createElement("div",null,
+          React.createElement("div",{style:s.h},"Upload Your HTML File"),
+          React.createElement("p",{style:s.p},"In your new repo, click \"Add file\" → \"Upload files\". Drag this HTML file in. Important: name it index.html so GitHub Pages serves it as the homepage. Click \"Commit changes\"."),
+        )
+      ),
+
+      /* Step 4 */
+      React.createElement("div",{style:s.step},
+        React.createElement("div",{style:s.num},"4"),
+        React.createElement("div",null,
+          React.createElement("div",{style:s.h},"Enable GitHub Pages"),
+          React.createElement("p",{style:s.p},"Go to your repo → Settings → Pages (in left sidebar under \"Code and automation\"). Under \"Source\", select \"Deploy from a branch\". Pick the \"main\" branch and \"/\" (root). Click Save."),
+        )
+      ),
+
+      /* Step 5 */
+      React.createElement("div",{style:s.step},
+        React.createElement("div",{style:s.num},"5"),
+        React.createElement("div",null,
+          React.createElement("div",{style:s.h},"Access Your Live Site"),
+          React.createElement("p",{style:s.p},"Wait 1–2 minutes. Your site will be live at:"),
+          React.createElement("code",{style:s.code},"https://your-username.github.io/taobao-skirts-matrix/"),
+          React.createElement("p",{style:s.p},"Or if you used the username.github.io repo name:"),
+          React.createElement("code",{style:s.code},"https://your-username.github.io/"),
+        )
+      ),
+
+      /* Maintaining */
+      React.createElement("div",{style:{borderTop:"1px solid rgba(255,255,255,.06)",paddingTop:16,marginTop:8}},
+        React.createElement("div",{style:{...s.h,marginTop:0,fontSize:15}},"Maintaining & Updating"),
+        React.createElement("p",{style:s.p},"To update: go to your repo on GitHub, click the file, click the pencil icon (edit), paste the new code, and commit. Changes go live within a minute."),
+        React.createElement("p",{style:s.p},"To add more pages: upload additional HTML files. Access them at /filename.html on your Pages URL."),
+        React.createElement("p",{style:s.p},"To organize: create folders in your repo for different projects. Each folder with an index.html becomes a sub-page."),
+      ),
+
+      /* Tips */
+      React.createElement("div",{style:{borderTop:"1px solid rgba(255,255,255,.06)",paddingTop:16,marginTop:12}},
+        React.createElement("div",{style:{...s.h,marginTop:0,fontSize:15}},"Pro Tips"),
+        React.createElement("p",{style:s.p},"• You can add a custom domain in Settings → Pages → Custom domain (you'll need to configure DNS with your domain provider)."),
+        React.createElement("p",{style:s.p},"• HTTPS is automatically enabled and free."),
+        React.createElement("p",{style:s.p},"• Repo size limit is 1 GB, bandwidth limit is ~100 GB/month — more than enough for personal projects."),
+        React.createElement("p",{style:s.p},"• If your site uses files starting with underscore (_), add an empty file named .nojekyll to your repo root."),
+        React.createElement("p",{style:s.p},"• For easier workflow, install GitHub Desktop (free) to drag-and-drop files instead of using the web UI."),
+      ),
+    )
+  );
+}
+
+
+/* ─── MAIN APP ─── */
+function App(){
+  const [sortBy,setSortBy]=useState("weighted");
+  const [filterV,setFilterV]=useState(null);
+  const [expandId,setExpandId]=useState(null);
+  const [showMethod,setShowMethod]=useState(false);
+
+  const sorted=useMemo(function(){
+    let items=[...SKIRTS];
+    if(filterV) items=items.filter(function(s){return s.verdicts.includes(filterV)});
+    items.sort(function(a,b){
+      if(sortBy==="weighted") return getWeightedScore(b.scores)-getWeightedScore(a.scores);
+      return (b.scores[sortBy]||0)-(a.scores[sortBy]||0);
+    });
+    return items;
+  },[sortBy,filterV]);
+
+  return React.createElement("div",{style:{minHeight:"100vh",background:"#0a0a0c",paddingBottom:40}},
+    /* Header */
+    React.createElement("div",{style:{padding:"32px 20px 24px",background:"linear-gradient(180deg,rgba(255,255,255,.03) 0%,transparent 100%)",borderBottom:"1px solid rgba(255,255,255,.05)"}},
+      React.createElement("div",{style:{fontSize:10,fontWeight:700,letterSpacing:2.5,color:"rgba(255,255,255,.25)",textTransform:"uppercase",marginBottom:8}},"Taobao Activewear Research — April 2026"),
+      React.createElement("h1",{style:{fontSize:28,fontWeight:400,margin:"0 0 6px",fontFamily:"'Instrument Serif',Georgia,serif",lineHeight:1.15,letterSpacing:-.5,background:"linear-gradient(135deg,#f0f0f0,#94a3b8)",WebkitBackgroundClip:"text",WebkitTextFillColor:"transparent"}},"Women's Sports Skirts"),
+      React.createElement("p",{style:{fontSize:13,color:"rgba(255,255,255,.35)",margin:0,lineHeight:1.5,maxWidth:420}},"Comparative grading of 8 popular sports skirts on Taobao. Tap any card to see pros/cons. Links open Taobao search/store pages.")
+    ),
+
+    React.createElement("div",{style:{padding:"0 16px",maxWidth:560,margin:"0 auto"}},
+
+      /* Methodology */
+      React.createElement("div",{style:{marginTop:20}},
+        React.createElement("button",{onClick:function(){setShowMethod(!showMethod)},style:{width:"100%",padding:"14px 18px",background:"rgba(255,255,255,.02)",border:"1px solid rgba(255,255,255,.07)",borderRadius:12,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"space-between",color:"#e2e8f0"}},
+          React.createElement("span",{style:{fontSize:12,fontWeight:700,letterSpacing:.5,textTransform:"uppercase"}},"◎ Evaluation Methodology"),
+          React.createElement("span",{style:{fontSize:11,color:"rgba(255,255,255,.3)"}},showMethod?"▲":"▼")
+        ),
+        showMethod && React.createElement("div",{style:{padding:18,marginTop:1,background:"rgba(255,255,255,.02)",border:"1px solid rgba(255,255,255,.07)",borderTop:"none",borderRadius:"0 0 12px 12px",animation:"fadeSlide .3s ease"}},
+          React.createElement("p",{style:{fontSize:12,color:"rgba(255,255,255,.5)",margin:"0 0 14px",lineHeight:1.7}},"Each skirt is scored 1–10 across six criteria, then combined via weighted aggregate. Scores derived from community reviews on Lemon8, Xiaohongshu, Zhihu, and TikTok, cross-referenced with store ratings and product specs."),
+          React.createElement("div",{style:{display:"grid",gap:8}},
+            CRITERIA.map(function(c){
+              return React.createElement("div",{key:c.key,style:{display:"flex",alignItems:"flex-start",gap:10,padding:"8px 12px",borderRadius:8,background:"rgba(255,255,255,.02)"}},
+                React.createElement("span",{style:{fontSize:13,fontWeight:800,color:"#38bdf8",fontFamily:"'JetBrains Mono',monospace",minWidth:38}},(c.weight*100).toFixed(0)+"%"),
+                React.createElement("div",null,
+                  React.createElement("div",{style:{fontSize:12,fontWeight:700,color:"#e2e8f0"}},c.label),
+                  React.createElement("div",{style:{fontSize:11,color:"rgba(255,255,255,.35)",lineHeight:1.4}},c.desc)
+                )
+              );
+            })
+          ),
+          React.createElement("p",{style:{fontSize:11,color:"rgba(255,255,255,.25)",margin:"14px 0 0",lineHeight:1.6,fontStyle:"italic"}},"Price Value = cost-per-wear potential. Fabric Tech = material composition & performance features. Functionality = built-in shorts, pockets, modesty features. Scores are approximate and based on available community data.")
+        )
+      ),
+
+      /* Legend */
+      React.createElement("div",{style:{marginTop:16,padding:"14px 16px",background:"rgba(255,255,255,.02)",border:"1px solid rgba(255,255,255,.07)",borderRadius:12}},
+        React.createElement("div",{style:{fontSize:10,fontWeight:700,letterSpacing:1,textTransform:"uppercase",color:"rgba(255,255,255,.3)",marginBottom:10}},"Verdict Tags — tap to filter"),
+        React.createElement("div",{style:{display:"flex",gap:6,flexWrap:"wrap"}},
+          Object.entries(VERDICT_TAGS).map(function([key,v]){
+            return React.createElement("button",{key:key,onClick:function(e){e.stopPropagation();setFilterV(filterV===key?null:key)},style:{padding:"4px 10px",borderRadius:20,fontSize:10,fontWeight:700,letterSpacing:.3,color:filterV===key?"#0a0a0c":v.color,background:filterV===key?v.color:v.bg,border:`1px solid ${v.color}44`,cursor:"pointer",textTransform:"uppercase",transition:"all .2s",whiteSpace:"nowrap"}},v.label);
+          }),
+          filterV && React.createElement("button",{onClick:function(e){e.stopPropagation();setFilterV(null)},style:{padding:"4px 10px",borderRadius:20,fontSize:10,fontWeight:700,color:"rgba(255,255,255,.4)",background:"rgba(255,255,255,.05)",border:"1px solid rgba(255,255,255,.1)",cursor:"pointer"}},"✕ Clear")
+        )
+      ),
+
+      /* Sort */
+      React.createElement("div",{style:{marginTop:16,display:"flex",gap:6,overflowX:"auto",paddingBottom:4}},
+        SORT_OPTIONS.map(function(opt){
+          return React.createElement("button",{key:opt.key,onClick:function(){setSortBy(opt.key)},style:{padding:"8px 14px",borderRadius:10,fontSize:11,fontWeight:600,whiteSpace:"nowrap",color:sortBy===opt.key?"#0a0a0c":"rgba(255,255,255,.45)",background:sortBy===opt.key?"#e2e8f0":"rgba(255,255,255,.04)",border:sortBy===opt.key?"1px solid #e2e8f0":"1px solid rgba(255,255,255,.08)",cursor:"pointer",transition:"all .2s"}},opt.label);
+        })
+      ),
+
+      /* Count */
+      React.createElement("div",{style:{marginTop:14,fontSize:11,color:"rgba(255,255,255,.25)",fontWeight:600,letterSpacing:.5}},
+        sorted.length+" result"+(sorted.length!==1?"s":"")+" · sorted by "+SORT_OPTIONS.find(function(o){return o.key===sortBy}).label+(filterV?" · filtered: "+VERDICT_TAGS[filterV].label:"")
+      ),
+
+      /* Cards */
+      React.createElement("div",{style:{marginTop:12,display:"grid",gap:12}},
+        sorted.map(function(item,i){
+          return React.createElement(Card,{key:item.id,item:item,rank:i+1,expanded:expandId===item.id,onToggle:function(){setExpandId(expandId===item.id?null:item.id)}});
+        })
+      ),
+
+      sorted.length===0 && React.createElement("div",{style:{textAlign:"center",padding:"40px 20px",color:"rgba(255,255,255,.25)",fontSize:13}},"No skirts match this filter. Tap a verdict tag to clear."),
+
+      /* GitHub Pages Guide */
+      React.createElement(GithubGuide,null),
+
+      /* Footer */
+      React.createElement("div",{style:{marginTop:28,padding:"16px 0",borderTop:"1px solid rgba(255,255,255,.05)",textAlign:"center"}},
+        React.createElement("p",{style:{fontSize:11,color:"rgba(255,255,255,.2)",margin:0,lineHeight:1.6}},"Data sourced from Lemon8, Xiaohongshu, Zhihu, TikTok reviews & Taobao/Tmall listings. Prices in CNY (¥). Scores approximate community sentiment as of April 2026. Links point to Taobao search results for each store/product.")
+      )
+    )
+  );
+}
+
+ReactDOM.render(React.createElement(App,null),document.getElementById("root"));
+</script>
+</body>
+</html>
